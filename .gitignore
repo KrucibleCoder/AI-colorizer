@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+.venv/
+
+# Upload/output folders (optional)
+uploads/
+outputs/
+
+# OS junk
+.DS_Store
+Thumbs.db
