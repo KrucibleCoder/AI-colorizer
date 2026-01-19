@@ -12,3 +12,17 @@ outputs/
 # OS junk
 .DS_Store
 Thumbs.db
+
+# ML models / weights (DO NOT COMMIT)
+models/
+*.pth
+*.pt
+*.onnx
+*.ckpt
+*.tflite
+*.bin
+*.pkl
+*.joblib
+
+# Node junk
+frontend/node_modules/
