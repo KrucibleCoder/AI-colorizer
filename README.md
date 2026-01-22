@@ -141,7 +141,7 @@ Clears:
 
 ## 📄 Setup Guide
 
-For full setup, troubleshooting, and notes:
+For full detailed setup, troubleshooting, and notes:
 ✅ See `SETUP.md`
 
 ---
@@ -150,3 +150,4 @@ For full setup, troubleshooting, and notes:
 
 MIT (recommended)  
 Add your license here.
+
