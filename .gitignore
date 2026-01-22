@@ -5,24 +5,17 @@ __pycache__/
 # Virtual env
 .venv/
 
-# Upload/output folders (optional)
-uploads/
-outputs/
-
 # OS junk
 .DS_Store
 Thumbs.db
 
 # ML models / weights (DO NOT COMMIT)
-models/
-*.pth
-*.pt
-*.onnx
-*.ckpt
-*.tflite
-*.bin
-*.pkl
-*.joblib
+/models/colorization/*.prototxt
+/models/colorization/*.npy
+/models/colorization/*.caffemodel
 
 # Node junk
 frontend/node_modules/
+
+# Other ignorable files
+/model archives
