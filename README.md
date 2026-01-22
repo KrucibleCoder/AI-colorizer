@@ -101,6 +101,14 @@ mkdir models\colorization
 - colorization_release_v2.caffemodel
 - pts_in_hull.npy
 
+  Reliable full download commands:
+  ```powershell
+  Invoke-WebRequest -Uri "https://raw.githubusercontent.com/richzhang/colorization/caffe/models/colorization_deploy_v2.prototxt" -OutFile "colorization_deploy_v2.prototxt"
+  Invoke-WebRequest -Uri "https://raw.githubusercontent.com/richzhang/colorization/caffe/resources/pts_in_hull.npy" -OutFile "pts_in_hull.npy"
+  Invoke-WebRequest -Uri "https://www.dropbox.com/scl/fi/d8zffur3wmd4wet58dp9x/colorization_release_v2.caffemodel?rlkey=iippu6vtsrox3pxkeohcuh4oy&dl=1" -OutFile "colorization_release_v2.caffemodel"
+
+  ```
+
 Final result must look like:
 ```text
 models/colorization/colorization_deploy_v2.prototxt
