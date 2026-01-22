@@ -1,0 +1,218 @@
+# AI Image Colorizer (FastAPI + React)
+
+A full-stack AI-powered image enhancement + colorization project.
+
+✅ Upload an image  
+✅ Choose a processing mode:
+- Enhance Only
+- Colorize Only (AI)
+- Enhance + Colorize  
+✅ Get 3 output variants  
+✅ Download results  
+✅ Delete generated files (privacy + storage)
+
+---
+
+## Tech Stack
+
+### Backend
+- Python
+- FastAPI
+- Uvicorn
+- OpenCV (for enhancement + AI colorization pipeline)
+- NumPy
+
+### Frontend
+- React (Vite)
+- Axios
+
+---
+
+## Project Structure
+
+AI-colorizer/
+│
+├── app/ # FastAPI backend logic
+│ ├── main.py # API entry
+│ ├── pipeline.py # decides which mode to run
+│ ├── enhance.py # enhancement variants
+│ ├── colorize.py # AI colorization
+│ └── storage.py # upload/output paths + delete
+│
+├── uploads/ # uploaded files (generated)
+├── outputs/ # output variants (generated)
+│
+├── models/
+│ └── colorization/ # local AI weights (NOT committed)
+│
+└── frontend/ # React frontend
+
+
+---
+
+## Requirements
+
+### Software Needed
+- Python 3.10+ (recommended)
+- Node.js 18+ (recommended)
+- Git
+
+---
+
+## Setup Instructions (Fresh Clone)
+
+### 1) Clone the repo
+```powershell
+git clone <YOUR_REPO_URL>
+cd AI-colorizer
+Backend Setup (FastAPI)
+2) Create and activate virtual environment
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+If activation is blocked due to execution policy:
+
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+3) Install Python dependencies
+pip install fastapi uvicorn python-multipart pillow opencv-python numpy
+Model Setup (IMPORTANT)
+This project uses OpenCV DNN colorization weights.
+These model files are NOT committed to GitHub (they are ignored in .gitignore).
+
+4) Create models folder
+mkdir models
+mkdir models\colorization
+5) Download the model files and place them here:
+✅ Put these 3 files into:
+
+models/colorization/
+Required files:
+
+colorization_deploy_v2.prototxt
+
+colorization_release_v2.caffemodel
+
+pts_in_hull.npy
+
+Final result must look like:
+
+models/colorization/colorization_deploy_v2.prototxt
+models/colorization/colorization_release_v2.caffemodel
+models/colorization/pts_in_hull.npy
+⚠️ If these files are missing, Colorize mode will fail.
+
+6) Run the backend
+From repo root:
+
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+Backend URL:
+
+http://127.0.0.1:8000
+
+Swagger docs:
+
+http://127.0.0.1:8000/docs
+
+Frontend Setup (React)
+7) Install frontend dependencies
+Open a NEW terminal in the repo root:
+
+cd frontend
+npm install
+8) Start frontend
+npm run dev
+Frontend URL:
+
+http://localhost:5173
+
+How to Use
+Open the frontend in your browser:
+
+http://localhost:5173
+
+Upload an image
+
+Select one of the modes:
+
+Enhance Only
+
+Colorize Only
+
+Enhance + Colorize
+
+Click Generate Variants
+
+Preview and download results
+
+Use Delete All to remove generated files
+
+API Endpoints
+POST /api/upload?mode=enhance|colorize|both
+Uploads an image and returns output URLs.
+
+Example response:
+
+{
+  "message": "Upload successful",
+  "mode": "colorize",
+  "original": "/uploads/example.jpg",
+  "variants": [
+    "/outputs/example_colorize1.jpg",
+    "/outputs/example_colorize2.jpg",
+    "/outputs/example_colorize3.jpg"
+  ]
+}
+DELETE /api/delete_all
+Deletes everything from:
+
+/uploads
+
+/outputs
+
+Notes About Large Files (IMPORTANT)
+Model weight files are ignored and should never be committed.
+
+Your .gitignore includes:
+
+.venv/
+
+frontend/node_modules/
+
+models/colorization/*.prototxt
+
+models/colorization/*.caffemodel
+
+models/colorization/*.npy
+
+Common Issues
+Frontend says: "Upload failed. Check backend is running."
+Fix:
+
+Make sure backend is running at:
+
+http://127.0.0.1:8000
+
+Ensure FastAPI has CORS enabled for:
+
+http://localhost:5173
+
+Colorize mode crashes / doesn't work
+Cause:
+Missing model files.
+
+Fix:
+Make sure the 3 required files exist inside:
+
+models/colorization/
+Future Improvements
+Higher quality AI colorization model (DeOldify / diffusion)
+
+Better multi-variant generation (real variety)
+
+Session-based deletion for multi-user hosting
+
+Batch processing
+
+Offline EXE / APK packaging
+
+License
+Add your license here (MIT recommended for open source).
