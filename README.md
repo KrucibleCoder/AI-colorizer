@@ -142,7 +142,7 @@ Clears:
 ## 📄 Setup Guide
 
 For full detailed setup, troubleshooting, and notes:
-✅ See `SETUP.md`
+✅ See `[SETUP.md](./SETUP.md)`
 
 ---
 
@@ -150,4 +150,5 @@ For full detailed setup, troubleshooting, and notes:
 
 MIT (recommended)  
 Add your license here.
+
 
