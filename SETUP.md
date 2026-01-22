@@ -231,4 +231,16 @@ models/colorization/
 ---
 # License
 
-Add your license here (MIT recommended for open source).
+### Third-party models & assets
+This project uses the pretrained model assets from:
+
+- **Colorful Image Colorization** (Richard Zhang, Phillip Isola, Alexei A. Efros, ECCV 2016)  
+  License: **BSD-2-Clause**  
+  Source: `richzhang/colorization`
+
+Model files used:
+- `colorization_deploy_v2.prototxt`
+- `pts_in_hull.npy`
+- `colorization_release_v2.caffemodel`
+
+These files are downloaded locally during setup and are **not included in this repository**.
