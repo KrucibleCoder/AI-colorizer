@@ -12,9 +12,14 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-  const selectedFileName = useMemo(() => file?.name || "No file selected", [file]);
+  const selectedFileName = useMemo(
+    () => file?.name || "No file selected",
+    [file]
+  );
 
   async function handleUpload() {
+    if (loading) return;
+
     if (!file) {
       setMsg("Please select an image first.");
       return;
@@ -27,9 +32,13 @@ export default function App() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await axios.post(`${API_BASE}/api/upload?mode=${mode}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axios.post(
+        `${API_BASE}/api/upload?mode=${mode}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       setOriginalUrl(`${API_BASE}${res.data.original}`);
       setVariants(res.data.variants.map((v) => `${API_BASE}${v}`));
@@ -43,13 +52,23 @@ export default function App() {
   }
 
   async function handleDeleteAll() {
+    if (loading) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete all generated images?\n\nThis action cannot be undone."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     setLoading(true);
     try {
       await axios.delete(`${API_BASE}/api/delete_all`);
       setOriginalUrl("");
       setVariants([]);
       setFile(null);
-      setMsg("🧹 Cleared uploads + outputs.");
+      setMsg("🧹 All generated images were deleted.");
     } catch (err) {
       console.error(err);
       setMsg("❌ Delete failed.");
@@ -64,7 +83,8 @@ export default function App() {
         <div>
           <h1 className="title">AI Image Colorizer</h1>
           <p className="subtitle">
-            Upload a photo, choose a preset, preview variants, download what you like.
+            Upload a photo, choose a preset, preview variants, download what you
+            like.
           </p>
         </div>
 
@@ -86,8 +106,14 @@ export default function App() {
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
                 disabled={loading}
+                onChange={(e) => {
+                  const selected = e.target.files?.[0] || null;
+                  setFile(selected);
+                  setOriginalUrl("");
+                  setVariants([]);
+                  setMsg("");
+                }}
               />
               <div className="fileBoxInner">
                 <div className="fileIcon">📷</div>
@@ -114,7 +140,11 @@ export default function App() {
           </div>
 
           <div className="actions">
-            <button className="btn btnPrimary" onClick={handleUpload} disabled={loading}>
+            <button
+              className="btn btnPrimary"
+              onClick={handleUpload}
+              disabled={loading}
+            >
               {loading ? (
                 <span className="btnRow">
                   <span className="spinner" />
@@ -125,7 +155,11 @@ export default function App() {
               )}
             </button>
 
-            <button className="btn btnDanger" onClick={handleDeleteAll} disabled={loading}>
+            <button
+              className="btn btnDanger"
+              onClick={handleDeleteAll}
+              disabled={loading || (!originalUrl && variants.length === 0)}
+            >
               Delete All
             </button>
           </div>
@@ -135,25 +169,29 @@ export default function App() {
           <div className="tips">
             <div className="tipTitle">Tips</div>
             <ul>
-              <li>Try old photos with low contrast for best “wow”.</li>
+              <li>Old or faded photos work best.</li>
               <li>Use “Both” for enhanced color + sharpness.</li>
-              <li>Hit “Delete All” to clear server storage.</li>
+              <li>Delete clears all server-side files.</li>
             </ul>
           </div>
         </section>
 
-        {/* Right: Previews */}
+        {/* Right: Preview */}
         <section className="card">
           <div className="cardHeaderRow">
             <h2 className="cardTitle">Preview</h2>
-            <span className="muted">{variants.length ? "Results ready" : "Waiting for upload"}</span>
+            <span className="muted">
+              {variants.length ? "Results ready" : "Waiting for upload"}
+            </span>
           </div>
 
           {!originalUrl && (
             <div className="empty">
               <div className="emptyIcon">🖼️</div>
               <div className="emptyTitle">No image yet</div>
-              <div className="emptyText">Upload an image and generate variants to preview them here.</div>
+              <div className="emptyText">
+                Upload an image and generate variants to preview them here.
+              </div>
             </div>
           )}
 
@@ -162,11 +200,20 @@ export default function App() {
               <div className="previewBlock">
                 <div className="previewHeader">
                   <span className="badge">Original</span>
-                  <a className="link" href={originalUrl} target="_blank" rel="noreferrer">
+                  <a
+                    className="link"
+                    href={originalUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Open full
                   </a>
                 </div>
-                <img className="image" src={originalUrl} alt="original" />
+                <img
+                  className="image"
+                  src={originalUrl}
+                  alt="original"
+                />
               </div>
 
               <div className="variantsHeader">
@@ -179,7 +226,12 @@ export default function App() {
                     <div className="variantTop">
                       <span className="badge">Variant {idx + 1}</span>
                       <div className="variantLinks">
-                        <a className="link" href={url} target="_blank" rel="noreferrer">
+                        <a
+                          className="link"
+                          href={url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           Open
                         </a>
                         <a className="link" href={url} download>
@@ -188,7 +240,11 @@ export default function App() {
                       </div>
                     </div>
 
-                    <img className="image" src={url} alt={`variant-${idx + 1}`} />
+                    <img
+                      className="image"
+                      src={url}
+                      alt={`variant-${idx + 1}`}
+                    />
                   </div>
                 ))}
               </div>
@@ -199,7 +255,7 @@ export default function App() {
 
       <footer className="footer">
         <span>Built with FastAPI + React</span>
-        <span className="muted">MVP UI polish pass</span>
+        <span className="muted">Portfolio-ready MVP</span>
       </footer>
     </div>
   );
