@@ -1,0 +1,65 @@
+/* ============================================================
+   GLOBAL PAGE LAYOUT
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  padding: 28px;
+  box-sizing: border-box;
+  color: #eaeaf1;
+  background:
+    radial-gradient(1200px 800px at 10% 10%, #2a2a55 0%, rgba(0, 0, 0, 0) 60%),
+    radial-gradient(1200px 800px at 90% 30%, #214d4a 0%, rgba(0, 0, 0, 0) 60%),
+    linear-gradient(180deg, #0b0b12 0%, #07070c 100%);
+}
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
+
+.topbar {
+  max-width: 1100px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ============================================================
+   MAIN GRID (WORKSPACE + PREVIEW)
+   ============================================================ */
+
+.grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   COMPARISON CAROUSEL AND REVIEW SHELLS (glass look — user-preferred)
+   ============================================================ */
+
+.comparisonAndReviews {
+  max-width: 1400px;
+  margin: 40px auto 0;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 1.4fr 1.6fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .comparisonAndReviews {
+    grid-template-columns: 1fr;
+  }
+}

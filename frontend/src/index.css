@@ -1,8 +1,5 @@
-:root {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  line-height: 1.5;
-}
-
-body {
-  margin: 0;
-}
+@import "./base.css";
+@import "./layout.css";
+@import "./components.css";
+@import "./skeleton.css";
+@import "./utilities.css";
