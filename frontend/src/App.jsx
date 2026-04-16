@@ -57,6 +57,43 @@ export default function App() {
   const maxSlides = Math.max(bwImages.length, coloredImages.length, 1);
   const [carouselIndex, setCarouselIndex] = useState(0);
 
+  /* ---------- Feedback state ---------- */
+  const [scores, setScores] = useState({});
+  const [feedbackComment, setFeedbackComment] = useState("");
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [feedbackStatus, setFeedbackStatus] = useState(null);
+  // null | "success" | "partial" | "error"
+
+  const selectedFileName = useMemo(
+    () => file?.name || "No file selected",
+    [file],
+  );
+
+  /* =========================================================
+     Cleanup on refresh / tab close
+     Clears backend storage on page unload
+     ========================================================= */
+  useEffect(() => {
+    const handleCleanup = () => {
+      try {
+        fetch(`${API_BASE}/api/delete_all`, {
+          method: "DELETE",
+          keepalive: true,
+        });
+      } catch {
+        // ignore unload cleanup errors
+      }
+    };
+
+    window.addEventListener("beforeunload", handleCleanup);
+    window.addEventListener("pagehide", handleCleanup);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleCleanup);
+      window.removeEventListener("pagehide", handleCleanup);
+    };
+  }, []);
+
   useEffect(() => {
     if (maxSlides <= 1) return;
     const t = setInterval(
@@ -66,24 +103,10 @@ export default function App() {
     return () => clearInterval(t);
   }, [maxSlides]);
 
-  const selectedFileName = useMemo(
-    () => file?.name || "No file selected",
-    [file],
-  );
-
-  /* ---------- Feedback state (single comment, per-variant scores) ---------- */
-  const [scores, setScores] = useState({}); // { [url]: number (0-100) }
-  const [feedbackComment, setFeedbackComment] = useState("");
-  const [submittingFeedback, setSubmittingFeedback] = useState(false);
-
-  // UX state for feedback outcome
-  const [feedbackStatus, setFeedbackStatus] = useState(null);
-  // null | "success" | "partial" | "error"
-
   function initScoresForVariants(vars) {
     const s = {};
-    vars.forEach((v, i) => {
-      s[v] = scores[v] ?? 100; // default 100 (like)
+    vars.forEach((v) => {
+      s[v] = scores[v] ?? 100;
     });
     setScores(s);
   }
@@ -93,8 +116,6 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variants.length]);
 
-  /* optional small UX: auto-clear message after a short time
-     but do not auto-clear while feedback is actively submitting */
   useEffect(() => {
     if (!msg || submittingFeedback) return;
     const t = setTimeout(() => setMsg(""), 4000);
@@ -110,16 +131,19 @@ export default function App() {
 
     if (!file) {
       setMsg("Please select an image first.");
+      setFeedbackStatus("error");
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
       setMsg("File too large. Please upload an image under 10MB.");
+      setFeedbackStatus("error");
       return;
     }
 
     setLoading(true);
     setMsg("");
+    setFeedbackStatus(null);
 
     try {
       const formData = new FormData();
@@ -137,7 +161,7 @@ export default function App() {
       setDownloadProgress({});
       initScoresForVariants(vs);
       setMsg(`✅ Generated results using "${mode}" mode.`);
-      setFeedbackStatus(null);
+      setFeedbackComment("");
     } catch (err) {
       console.error(err);
       setMsg("❌ Upload failed. Check backend.");
@@ -213,12 +237,12 @@ export default function App() {
     } catch (err) {
       console.error("Download failed", err);
       setMsg("❌ Download failed.");
+      setFeedbackStatus("error");
       setDownloadProgress((p) => {
         const copy = { ...p };
         delete copy[url];
         return copy;
       });
-      setFeedbackStatus("error");
     }
   }
 
@@ -247,12 +271,13 @@ export default function App() {
   }
 
   /* =========================
-     Feedback submit (single comment for all variants)
+     Feedback submit
      ========================= */
 
   async function submitAllFeedback() {
     if (variants.length === 0) {
       setMsg("No variants to review.");
+      setFeedbackStatus("error");
       return;
     }
 
@@ -262,11 +287,11 @@ export default function App() {
     let successCount = 0;
 
     try {
-      // Send one POST per variant (backend should accept this path)
       for (let i = 0; i < variants.length; i++) {
         const img = variants[i];
         const label = VARIANT_LABELS[i] || `Variant ${i + 1}`;
         const score = Math.max(0, Math.min(100, scores[img] ?? 100));
+
         try {
           await axios.post(`${API_BASE}/api/reviews`, {
             image: img,
@@ -276,7 +301,6 @@ export default function App() {
           });
           successCount += 1;
         } catch (err) {
-          // ignore per-image error but log
           console.warn("feedback submit failed for", img, err);
         }
       }
@@ -284,10 +308,12 @@ export default function App() {
       if (successCount === variants.length) {
         setFeedbackStatus("success");
         setMsg("✅ Feedback submitted successfully. Thank you for your feedback!");
-        setFeedbackComment(""); // clear textarea on full success
+        setFeedbackComment("");
       } else if (successCount > 0) {
         setFeedbackStatus("partial");
-        setMsg("⚠️ Some feedback entries failed to submit. Please try again if needed.");
+        setMsg(
+          "⚠️ Some feedback entries failed to submit. Please try again if needed.",
+        );
       } else {
         setFeedbackStatus("error");
         setMsg("❌ Feedback submission failed. Please try again.");
@@ -313,8 +339,7 @@ export default function App() {
         <div>
           <h1 className="title">AI Image Colorizer</h1>
           <p className="subtitle">
-            Upload a photo, choose a preset, preview variants, download what you
-            like.
+            Upload a photo, choose a preset, preview variants, download what you like.
           </p>
         </div>
         <div className="chip">
@@ -323,9 +348,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* Workspace + Preview */}
       <main className="grid">
-        {/* Workspace */}
         <section className="card">
           <h2 className="cardTitle">Workspace</h2>
 
@@ -339,6 +362,10 @@ export default function App() {
                 setOriginalUrl("");
                 setVariants([]);
                 setMsg("");
+                setFeedbackStatus(null);
+                setDownloadProgress({});
+                setFeedbackComment("");
+                setScores({});
               }}
             />
             <div className="fileBoxInner">
@@ -459,8 +486,6 @@ export default function App() {
         </section>
       </main>
 
-      {/* Downloads + Feedback panels placed directly below workspace/preview
-          Show while loading OR once variants exist (so skeletons appear while processing) */}
       {(loading || variants.length > 0) && (
         <section className="comparisonAndReviews" style={{ marginTop: 20 }}>
           <div className="comparisonLeft">
@@ -596,46 +621,45 @@ export default function App() {
               </div>
 
               {!loading && (
-                        <div style={{ marginTop: 12 }}>
-                          <div className="feedbackRow feedbackCommentRow">
-                            <textarea
-                              className="feedbackTextarea"
-                              placeholder="Optional feedback comment for all variants..."
-                              value={feedbackComment}
-                              onChange={(e) => setFeedbackComment(e.target.value)}
-                            />
-                          </div>
+                <div style={{ marginTop: 12 }}>
+                  <div className="feedbackRow feedbackCommentRow">
+                    <textarea
+                      className="feedbackTextarea"
+                      placeholder="Optional feedback comment for all variants..."
+                      value={feedbackComment}
+                      onChange={(e) => setFeedbackComment(e.target.value)}
+                    />
+                  </div>
 
-                          <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
-                            <button
-                              className="btn btnPrimary"
-                              onClick={submitAllFeedback}
-                              disabled={submittingFeedback}
-                            >
-                              {submittingFeedback ? "Submitting..." : "Submit All Feedback"}
-                            </button>
+                  <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
+                    <button
+                      className="btn btnPrimary"
+                      onClick={submitAllFeedback}
+                      disabled={submittingFeedback}
+                    >
+                      {submittingFeedback ? "Submitting..." : "Submit All Feedback"}
+                    </button>
 
-                            <button
-                              className="btn"
-                              onClick={() => {
-                                setFeedbackComment("");
-                                setScores({});
-                                initScoresForVariants(variants);
-                                setFeedbackStatus(null);
-                                setMsg("");
-                              }}
-                            >
-                              Clear
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                    <button
+                      className="btn"
+                      onClick={() => {
+                        setFeedbackComment("");
+                        setScores({});
+                        initScoresForVariants(variants);
+                        setFeedbackStatus(null);
+                        setMsg("");
+                      }}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              )}
             </section>
           </div>
         </section>
       )}
 
-      {/* Carousel + User Preference (keeps previous layout below) */}
       <section className="comparisonAndReviews" style={{ marginTop: 30 }}>
         <div className="comparisonLeft">
           <section className="comparisonCarousel">
