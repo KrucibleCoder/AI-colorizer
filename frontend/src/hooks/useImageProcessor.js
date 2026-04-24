@@ -31,13 +31,13 @@ export default function useImageProcessor() {
   async function uploadImage(setScores, setFeedbackStatus, setFeedbackComment) {
     if (!file) {
       setMsg("Please select an image first.");
-      setFeedbackStatus("error");
+      setFeedbackStatus?.("error");
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
       setMsg("File too large.");
-      setFeedbackStatus("error");
+      setFeedbackStatus?.("error");
       return;
     }
 
@@ -47,18 +47,28 @@ export default function useImageProcessor() {
     try {
       const data = await uploadService(file, mode);
 
-      setOriginalUrl(data.original);
-      setVariants(data.variants);
+      // IMPORTANT: attach backend base URL if needed
+      const original = data.original.startsWith("http")
+        ? data.original
+        : `http://127.0.0.1:8000${data.original}`;
+
+      const variantsFull = data.variants.map((v) =>
+        v.startsWith("http") ? v : `http://127.0.0.1:8000${v}`
+      );
+
+      setOriginalUrl(original);
+      setVariants(variantsFull);
 
       setDownloadProgress({});
-      initScoresForVariants(data.variants, setScores);
+      initScoresForVariants(variantsFull, setScores);
 
       setMsg("✅ Variants generated.");
-      setFeedbackComment("");
+      setFeedbackComment?.("");
+      setFeedbackStatus?.("success");
     } catch (err) {
       console.error(err);
       setMsg("❌ Upload failed.");
-      setFeedbackStatus("error");
+      setFeedbackStatus?.("error");
     } finally {
       setLoading(false);
     }
@@ -75,19 +85,20 @@ export default function useImageProcessor() {
       setOriginalUrl("");
       setVariants([]);
       setDownloadProgress({});
-      setScores({});
-      setFeedbackComment("");
-      setFeedbackStatus(null);
+      setScores?.({});
+      setFeedbackComment?.("");
+      setFeedbackStatus?.(null);
+
       setMsg("🧹 Cleared.");
     } catch (err) {
       console.error(err);
       setMsg("❌ Failed to clear.");
-      setFeedbackStatus("error");
+      setFeedbackStatus?.("error");
     }
   }
 
   /* =========================
-     Download (simple version)
+     Download
   ========================= */
   async function forceDownload(url, filename) {
     try {
@@ -104,6 +115,8 @@ export default function useImageProcessor() {
       setMsg("❌ Download failed.");
     }
   }
+
+  
 
   return {
     file,

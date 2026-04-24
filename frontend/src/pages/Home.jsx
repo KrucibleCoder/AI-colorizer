@@ -17,15 +17,14 @@ export default function Home() {
   /* cleanup on refresh */
   useEffect(() => {
     const cleanup = () => {
-      fetch("http://127.0.0.1:8000/api/delete_all", {
-        method: "DELETE",
-        keepalive: true,
-      });
+      navigator.sendBeacon("http://127.0.0.1:8000/api/delete_all");
     };
 
     window.addEventListener("beforeunload", cleanup);
     return () => window.removeEventListener("beforeunload", cleanup);
   }, []);
+
+  
 
   return (
     <div className="page">
@@ -47,22 +46,29 @@ export default function Home() {
           loading={img.loading}
         />
       </main>
-
-      <section className="comparisonAndReviews">
-        <Downloads
-          variants={img.variants}
-          loading={img.loading}
-          downloadProgress={img.downloadProgress}
-          forceDownloadWithProgress={img.forceDownload}
-        />
-
-        <Feedback
-          variants={img.variants}
-          {...fb}
-          submitAllFeedback={() => fb.submitFeedback(img.setMsg)}
-        />
-      </section>
-
+      
+      {(img.loading || img.variants.length > 0) && (
+        <section className="comparisonAndReviews">
+          <Downloads
+            variants={img.variants}
+            loading={img.loading}
+            downloadProgress={img.downloadProgress}
+            forceDownload={img.forceDownload}
+          />
+      
+          <Feedback
+            variants={img.variants}
+            scores={fb.scores}
+            setScores={fb.setScores}
+            feedbackComment={fb.feedbackComment}
+            setFeedbackComment={fb.setFeedbackComment}
+            submitting={fb.submitting}
+            status={fb.status}
+            submitAllFeedback={() => fb.submitFeedback(img.setMsg)}
+          />
+        </section>
+      )}
+      
       <section className="comparisonAndReviews">
         <Carousel />
         <UserPreference />
