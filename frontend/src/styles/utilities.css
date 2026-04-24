@@ -1,0 +1,41 @@
+/* ============================================================
+   UTILITIES & SHARED ELEMENTS
+   ============================================================ */
+
+.muted {
+  color: rgba(234, 234, 241, 0.65);
+  font-size: 12px;
+}
+
+.badge {
+  font-size: 12px;
+  color: rgba(234, 234, 241, 0.75);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.image {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  height: fit-content;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(145, 255, 210, 0.95);
+}
