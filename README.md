@@ -130,29 +130,7 @@ This approach keeps analytics private while remaining lightweight and offline-fr
 
 ## 📦 Project Structure
 
-```
-AI-colorizer/
-│
-├── app/
-│   ├── main.py              # API routes + security
-│   ├── pipeline.py          # mode-based processing
-│   ├── enhance.py           # enhancement variants
-│   ├── colorize.py          # AI colorization (OpenCV DNN)
-│   ├── feedback_nlp.py      # NLP analysis (NLTK + TextBlob)
-│   ├── review_analytics.py  # user satisfaction visuals
-│   └── dev_analytics.py     # developer-only analytics & reports
-│
-├── Reviews/                 # analytics data (tracked folder)
-│   └── .gitkeep
-│
-├── uploads/                 # generated uploads (ignored)
-├── outputs/                 # generated outputs (ignored)
-│
-├── models/
-│   └── colorization/        # model files
-│
-└── frontend/                # React frontend
-```
+[File Tree](./File.md)
 
 ---
 
@@ -164,7 +142,7 @@ AI-colorizer/
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 * API: [http://127.0.0.1:8000](http://127.0.0.1:8000)

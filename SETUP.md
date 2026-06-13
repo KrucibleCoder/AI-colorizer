@@ -42,29 +42,7 @@ A full-stack AI-powered image enhancement and colorization system featuring user
 
 ## 📁 Project Structure
 
-```text
-AI-colorizer/
-├── app/                     # Backend Logic
-│   ├── main.py              # API Entry Point
-│   ├── pipeline.py          # Processing Orchestrator
-│   ├── enhance.py           # Image Enhancement
-│   ├── colorize.py          # AI Colorization
-│   ├── storage.py           # File System Management
-│   ├── feedback_nlp.py      # NLP Analysis (Demo)
-│   ├── review_analytics.py  # Data Processing
-│   └── dev_analytics.py     # Report Generation
-│
-├── Reviews/                 # Feedback Data (gitignored)
-├── uploads/                 # Source Images (gitignored)
-├── outputs/                 # Processed Images (gitignored)
-│
-├── models/
-│   └── colorization/        # AI Weights
-│
-└── frontend/                # React Vite Project
-    └── src/pages/DevDashboard.jsx
-
-```
+[File Tree](./File.md)
 
 ---
 
