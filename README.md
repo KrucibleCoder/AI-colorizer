@@ -130,29 +130,7 @@ This approach keeps analytics private while remaining lightweight and offline-fr
 
 ## 📦 Project Structure
 
-```
-AI-colorizer/
-│
-├── app/
-│   ├── main.py              # API routes + security
-│   ├── pipeline.py          # mode-based processing
-│   ├── enhance.py           # enhancement variants
-│   ├── colorize.py          # AI colorization (OpenCV DNN)
-│   ├── feedback_nlp.py      # NLP analysis (NLTK + TextBlob)
-│   ├── review_analytics.py  # user satisfaction visuals
-│   └── dev_analytics.py     # developer-only analytics & reports
-│
-├── Reviews/                 # analytics data (tracked folder)
-│   └── .gitkeep
-│
-├── uploads/                 # generated uploads (ignored)
-├── outputs/                 # generated outputs (ignored)
-│
-├── models/
-│   └── colorization/        # model files
-│
-└── frontend/                # React frontend
-```
+[File Tree](./File.md)
 
 ---
 
